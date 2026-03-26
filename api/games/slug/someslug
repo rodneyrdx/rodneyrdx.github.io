@@ -1,0 +1,24 @@
+{
+  "success": true,
+  "data": {
+    "id": "6c1faa6a-eef1-4f70-bc94-3400de41ed32",
+    "title": "Test Game",
+    "thumb": "https://assets.plyground.ai/images/84b5ce69-0ea9-4fd0-934f-8a54d70c145a-rural-town-main.webp",
+    "cover_image": "https://assets.plyground.ai/images/bbafbd81-c283-4a27-9d41-652349fd8494-stripmall-thumb.webp",
+    "gallery_images": [],
+    "description": "This is my game",
+    "tags": [],
+    "game_file": "https://plyground-temp/6c1faa6a-eef1-4f70-bc94-3400de41ed32/6c1faa6a-eef1-4f70-bc94-3400de41ed32.zip",
+    "category": "Action",
+    "status": "resolved",
+    "deleted_at": null,
+    "created_at": "2026-02-09T20:56:03.108Z",
+    "updated_at": null,
+    "kinde_user_id": "kp_0cf0c1051f4a4e66871d0a9963de1acf",
+    "slug": "someslug",
+    "submitted_at": null,
+    "reviewed_at": null,
+    "reviewed_by": null,
+    "rejection_reason": null
+  }
+}
