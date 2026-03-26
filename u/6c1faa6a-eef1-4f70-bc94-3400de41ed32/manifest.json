@@ -1,0 +1,13 @@
+{
+  "slug": "someslug",
+  "gameId": "6c1faa6a-eef1-4f70-bc94-3400de41ed32",
+  "builtAt": "2026-03-26T12:46:51.487Z",
+  "apiBase": "https://api-dev.plyground.ai",
+  "gamesOrigin": "https://games.plyground.ai",
+  "files": [
+    "/u/6c1faa6a-eef1-4f70-bc94-3400de41ed32/Build/Build.loader.js",
+    "/u/6c1faa6a-eef1-4f70-bc94-3400de41ed32/Build/Build.framework.js",
+    "/u/6c1faa6a-eef1-4f70-bc94-3400de41ed32/Build/Build.wasm",
+    "/u/6c1faa6a-eef1-4f70-bc94-3400de41ed32/Build/Build.data"
+  ]
+}

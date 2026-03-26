@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plyground — Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800;900&family=Barlow:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #151515;
+    --teal: #3dbf8a;
+    --teal-dark: #2a9e6e;
+    --magenta: #c0186a;
+    --pink: #e040a0;
+    --orange: #f5a623;
+    --gold: #f5c842;
+    --white: #ffffff;
+    --off-white: #e8e8e8;
+    --muted: rgba(255,255,255,0.45);
+    --card-bg: rgba(255,255,255,0.93);
+    --card-text: #1a1a1a;
+    --surface-dark: rgba(255,255,255,0.06);
+    --surface-soft: rgba(255,255,255,0.05);
+    --stroke: rgba(255,255,255,0.09);
+    --blue: #59d7ff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: radial-gradient(circle at top, rgba(61,191,138,0.09), transparent 32%), var(--bg);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    overflow-x: hidden;
+  }
+
+  .page { position: relative; min-height: 100vh; }
+  .hex-bg {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  }
+  .hex-bg svg { width: 100%; height: 100%; opacity: 0.18; }
+  .content {
+    position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 56px 36px 80px;
+  }
+
+  .deck-header {
+    display: flex; align-items: center; gap: 28px; margin-bottom: 30px; animation: fadeUp 0.5s ease both;
+  }
+  .logo-mark { flex-shrink: 0; width: 72px; height: 72px; }
+  .footer-logo img,
+  .logo-mark { display: block; object-fit: contain; }
+  .section-banner {
+    display: inline-block; background: var(--teal); color: var(--white); font-family: 'Exo 2', sans-serif;
+    font-weight: 900; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 6px 18px; border-radius: 4px; margin-bottom: 12px;
+  }
+  .page-title {
+    font-family: 'Exo 2', sans-serif; font-weight: 900; font-size: clamp(34px, 5vw, 52px);
+    line-height: 1.0; color: var(--white); text-transform: uppercase;
+  }
+  .page-subtitle {
+    font-size: 15px; color: var(--orange); font-weight: 700; margin-top: 6px; font-family: 'Exo 2', sans-serif;
+  }
+  .intro-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
+    border: 1px solid var(--stroke); border-radius: 18px; padding: 24px 28px; color: var(--off-white);
+    line-height: 1.65; margin-bottom: 34px; animation: fadeUp 0.55s ease both;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.26);
+  }
+  .intro-card strong { color: #fff; }
+
+  .sec-head { text-align: center; margin-bottom: 24px; animation: fadeUp 0.4s ease both; }
+  .sec-banner {
+    display: inline-block; background: var(--teal); color: var(--white); font-family: 'Exo 2', sans-serif;
+    font-weight: 900; font-size: clamp(18px, 3vw, 28px); letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 10px 36px; border-radius: 6px;
+  }
+  .sec-tagline {
+    font-size: 15px; font-weight: 700; color: var(--orange); margin-top: 12px; font-family: 'Exo 2', sans-serif;
+    text-align: center;
+  }
+
+  .flow-shell {
+    display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(340px, 420px); gap: 22px;
+    align-items: stretch; margin-bottom: 38px;
+  }
+  .flow-wheel-card, .flow-info-card, .bridge-card, .route-section, .mono-card {
+    background: var(--surface-dark); border: 1px solid var(--stroke); border-radius: 22px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.24);
+    animation: fadeUp 0.5s ease both;
+  }
+  .flow-wheel-card {
+    position: relative; min-height: 640px; padding: 10px; overflow: hidden;
+  }
+  .flow-wheel-card::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(circle at center, rgba(89,215,255,0.07), transparent 42%);
+  }
+  .flow-svg { width: 100%; height: 100%; display: block; }
+
+  .sector { cursor: pointer; transition: opacity 0.25s ease, transform 0.25s ease; }
+  .sector path { transition: fill 0.2s ease, stroke 0.2s ease, transform 0.2s ease; }
+  .sector text { transition: fill 0.2s ease, opacity 0.2s ease; }
+  .sector:hover path, .sector.active path {
+    fill: rgba(89,215,255,0.13); stroke: rgba(89,215,255,0.52); transform: translateY(-2px);
+  }
+  .sector:hover text, .sector.active text { fill: #ffffff; opacity: 1; }
+
+  .flow-line-anim {
+    stroke-dasharray: 9 12; animation: flowDash 8s linear infinite;
+  }
+  .core-pulse { animation: pulseCore 3.2s ease-in-out infinite; }
+
+  .flow-info-card { padding: 28px 24px; display: flex; flex-direction: column; justify-content: space-between; }
+  .flow-kicker {
+    font-family: 'Exo 2', sans-serif; color: var(--orange); font-size: 12px; font-weight: 900;
+    letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .flow-title {
+    font-family: 'Exo 2', sans-serif; font-size: clamp(28px, 3.4vw, 38px); line-height: 1;
+    font-weight: 900; text-transform: uppercase; margin-bottom: 14px;
+  }
+  .flow-body { color: var(--off-white); line-height: 1.7; font-size: 15px; margin-bottom: 18px; }
+  .flow-points { display: grid; gap: 12px; margin-bottom: 18px; }
+  .flow-point {
+    background: var(--surface-soft); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px 14px 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .flow-point:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,0.22); }
+  .flow-point h4 {
+    font-family: 'Exo 2', sans-serif; font-size: 14px; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .flow-point p { color: rgba(255,255,255,0.76); font-size: 14px; line-height: 1.6; }
+  .flow-note {
+    padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.72); line-height: 1.65; font-size: 14px;
+  }
+
+  .bridge-card {
+    padding: 28px; margin-bottom: 42px;
+  }
+  .bridge-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; align-items: stretch;
+  }
+  .bridge-grid-top {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: stretch;
+  }
+  .bridge-step {
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+    border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 18px 14px; text-align: center;
+    position: relative; transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .bridge-step:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(0,0,0,0.22); }
+  .bridge-step:not(:last-child)::after {
+    content: '→'; position: absolute; right: -11px; top: 50%; transform: translateY(-50%);
+    font-family: 'Exo 2', sans-serif; font-weight: 900; color: var(--orange); font-size: 22px;
+  }
+  .bridge-mini {
+    font-family: 'Exo 2', sans-serif; color: var(--teal); font-size: 11px; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .bridge-title {
+    font-family: 'Exo 2', sans-serif; font-size: 18px; font-weight: 900; text-transform: uppercase; line-height: 1.1; margin-bottom: 10px;
+  }
+  .bridge-desc { color: rgba(255,255,255,0.72); line-height: 1.6; font-size: 13px; }
+
+  .tab-row {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .tab-btn {
+    border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: var(--white);
+    border-radius: 999px; padding: 12px 16px; cursor: pointer; font-family: 'Exo 2', sans-serif; font-weight: 800;
+    letter-spacing: 0.04em; transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  }
+  .tab-btn.active { background: var(--teal); border-color: rgba(61,191,138,0.45); color: #fff; }
+  .tab-btn:hover:not(.active) { transform: translateY(-2px); background: rgba(255,255,255,0.08); }
+  .scenario-panel { display: none; }
+  .scenario-panel.active { display: block; }
+
+  .route-section { padding: 24px; margin-bottom: 42px; }
+  .route-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .route-node, .route-card {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 18px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .route-node:hover, .route-card:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(0,0,0,0.2); }
+  .route-node h4, .route-card h4 {
+    font-family: 'Exo 2', sans-serif; font-size: 16px; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .route-node p, .route-card p { color: rgba(255,255,255,0.72); line-height: 1.65; font-size: 14px; }
+
+  .monetization-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .mono-card { padding: 24px; transition: transform 0.2s, box-shadow 0.2s; }
+  .mono-card:hover { transform: translateY(-4px); box-shadow: 0 16px 34px rgba(0,0,0,0.22); }
+  .mono-icon {
+    width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 14px;
+    background: rgba(89,215,255,0.12); border: 1px solid rgba(89,215,255,0.26); color: #fff; font-weight: 900; font-family: 'Exo 2', sans-serif;
+  }
+  .mono-title {
+    font-family: 'Exo 2', sans-serif; text-transform: uppercase; font-size: 18px; font-weight: 900; margin-bottom: 10px;
+  }
+  .mono-body { color: rgba(255,255,255,0.74); line-height: 1.7; font-size: 14px; }
+
+  .footer {
+    margin-top: 46px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .footer-logo { display: flex; align-items: center; gap: 10px; }
+  .footer-wordmark {
+    font-family: 'Exo 2', sans-serif; font-size: 22px; font-weight: 900; text-transform: lowercase; letter-spacing: 0.02em;
+  }
+  .footer-tagline { color: rgba(255,255,255,0.58); font-size: 13px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes flowDash {
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: -210; }
+  }
+  @keyframes pulseCore {
+    0%,100% { transform: scale(1); opacity: 0.95; }
+    50% { transform: scale(1.06); opacity: 1; }
+  }
+
+  @media (max-width: 1080px) {
+    .flow-shell, .route-grid, .monetization-grid, .bridge-grid { grid-template-columns: 1fr; }
+    .flow-wheel-card { min-height: 560px; }
+    .bridge-step:not(:last-child)::after { content: '↓'; right: auto; left: 50%; top: auto; bottom: -17px; transform: translateX(-50%); }
+  }
+  @media (max-width: 720px) {
+    .content { padding: 40px 18px 64px; }
+    .deck-header { align-items: flex-start; gap: 18px; }
+    .flow-wheel-card { min-height: 440px; padding: 8px; }
+    .route-section, .bridge-card, .flow-info-card, .mono-card { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="hex-bg" aria-hidden="true">
+  <svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <pattern id="diamonds" width="80" height="80" patternUnits="userSpaceOnUse">
+        <rect x="22" y="22" width="36" height="36" rx="2" fill="none" stroke="#c0186a" stroke-width="0.4" transform="rotate(45 40 40)"/>
+      </pattern>
+      <radialGradient id="fade" cx="50%" cy="50%" r="70%">
+        <stop offset="0%" stop-color="white" stop-opacity="1"/>
+        <stop offset="100%" stop-color="white" stop-opacity="0.08"/>
+      </radialGradient>
+      <mask id="vmask">
+        <rect width="1000" height="700" fill="url(#fade)"/>
+      </mask>
+    </defs>
+    <rect width="1000" height="700" fill="url(#diamonds)" mask="url(#vmask)"/>
+    <g opacity="0.35">
+      <rect x="-30" y="60" width="90" height="90" rx="8" fill="#7a0040" transform="rotate(45 15 105)"/>
+      <rect x="-60" y="160" width="70" height="70" rx="6" fill="#7a0040" transform="rotate(45 -25 195)"/>
+      <rect x="20" y="200" width="55" height="55" rx="5" fill="none" stroke="#7a0040" stroke-width="2" transform="rotate(45 47 227)"/>
+      <rect x="-10" y="300" width="75" height="75" rx="7" fill="#7a0040" transform="rotate(45 27 337)"/>
+    </g>
+    <g opacity="0.12">
+      <rect x="900" y="50" width="80" height="80" rx="6" fill="#3dbf8a" transform="rotate(45 940 90)"/>
+      <rect x="850" y="150" width="60" height="60" rx="5" fill="#3dbf8a" transform="rotate(45 880 180)"/>
+    </g>
+  </svg>
+</div>
+
+<div class="page">
+  <div class="content">
+    <div class="deck-header">
+      <img class="logo-mark" src="/assets/Plyground_Logo_2DIcon_Color_v2.svg" alt="Plyground logo" />
+      <div>
+        <div class="section-banner">Platform Concept</div>
+        <div class="page-title">PLYGROUND's flow</div>
+        <div class="page-subtitle">Plyground orchestrates assets across systems with AI as the translation layer</div>
+      </div>
+    </div>
+
+    <div class="intro-card">
+      A game in <strong>Plyground</strong> is not treated as one giant file. It is a set of <strong>interconnected systems</strong> built from assets, logic, world structure, characters, monetization surfaces, and player-facing behaviors. At the center, <strong>Plyground AI</strong> helps interpret creator intent and translate it into actions the platform can execute, so assets are orchestrated into a playable experience instead of handled as isolated pieces.
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-banner">Making a Playable Experience</div>
+      <div class="sec-tagline">A simple workflow to get from concept to playable game</div>
+    </div>
+
+    <div class="bridge-card">
+      <div class="bridge-grid-top">
+        <div class="bridge-step">
+          <div class="bridge-mini">1</div>
+          <div class="bridge-title">Select Experience</div>
+          <div class="bridge-desc">Choose the type of experience—shooter, racing, exploration, and more. This defines the core systems of your game.</div>
+        </div>
+        <div class="bridge-step">
+          <div class="bridge-mini">2</div>
+          <div class="bridge-title">Select Environment</div>
+          <div class="bridge-desc">Generate a complete, unique world. Plyground builds correct, production-ready environments, removing one of the biggest barriers in game creation.</div>
+        </div>
+        <div class="bridge-step">
+          <div class="bridge-mini">3</div>
+          <div class="bridge-title">Select Assets</div>
+          <div class="bridge-desc">Add characters, props, and gameplay elements. All assets are game-ready and integrate seamlessly into your systems.</div>
+        </div>
+        <div class="bridge-step">
+          <div class="bridge-mini">4</div>
+          <div class="bridge-title">Design the Level</div>
+          <div class="bridge-desc">Shape your experience by hand in a Unity-like editor or through prompts. Plyground AI helps connect everything into a playable game.</div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="sec-head">
+      <div class="sec-banner">AI Orchestration Flow</div>
+      <div class="sec-tagline">AI can drive each step of the creation process </div>
+    </div>
+    <div class="bridge-card">
+      <div class="bridge-grid">
+        <div class="bridge-step">
+          <div class="bridge-mini">1</div>
+          <div class="bridge-title">Creator Intent</div>
+          <div class="bridge-desc">The creator describes the kind of game, scene, rule, or feature they want to produce.</div>
+        </div>
+        <div class="bridge-step">
+          <div class="bridge-mini">2</div>
+          <div class="bridge-title">AI Translation</div>
+          <div class="bridge-desc">Plyground AI interprets the request and maps it to systems the platform understands.</div>
+        </div>
+        <div class="bridge-step">
+          <div class="bridge-mini">3</div>
+          <div class="bridge-title">Asset Orchestration</div>
+          <div class="bridge-desc">Assets, behaviors, placement, and links are coordinated across the project instead of handled in isolation.</div>
+        </div>
+        <div class="bridge-step">
+          <div class="bridge-mini">4</div>
+          <div class="bridge-title">Playable Build</div>
+          <div class="bridge-desc">The result can become a Unity project, a direct Plyground build, or a hosted web experience.</div>
+        </div>
+        <div class="bridge-step">
+          <div class="bridge-mini">5</div>
+          <div class="bridge-title">Monetized Loop</div>
+          <div class="bridge-desc">Ads and the broader platform economy can activate once the experience is live.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-banner">Build to your Level</div>
+      <div class="sec-tagline">Use the best tool for the job</div>
+    </div>
+
+    <div class="route-section">
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="showRoute('unity', this)">Unity Build</button>
+        <button class="tab-btn" onclick="showRoute('direct', this)">Local Plyground Build</button>
+        <button class="tab-btn" onclick="showRoute('publish', this)">Cloud Build</button>
+      </div>
+
+      <div class="scenario-panel active" id="route-unity">
+        <div class="route-grid">
+          <div class="route-node"><h4>Project Setup</h4><p>The creator starts with plyground, with assets and systems already organized as part of one project structure.</p></div>
+          <div class="route-node"><h4>Unity Export</h4><p>At any point, the creator can build a Unity project from the Plyground project for deeper engine-side iteration or packaging.</p></div>
+          <div class="route-card"><h4>Why it matters</h4><p>For unity developers, this provides a seamless workflow between Plyground and Unity's ecosystem.</p></div>
+        </div>
+      </div>
+
+      <div class="scenario-panel" id="route-direct">
+        <div class="route-grid">
+          <div class="route-node"><h4>Project Setup</h4><p>The creator uses only plyground and its built-in tools. Requires the user to install Unity but nothing else.</p></div>
+          <div class="route-node"><h4>Native Build</h4><p>The build is made by Unity on the background. The result is identical to the Unity build, without the need for additional setup.</p></div>
+          <div class="route-card"><h4>Why it matters</h4><p>For non-unity creators, this provides a way to create and publish games without needing to learn a different development environment.</p></div>
+        </div>
+      </div>
+
+      <div class="scenario-panel" id="route-publish">
+        <div class="route-grid">
+          <div class="route-node"><h4>Project Setup</h4><p>The creator uses only plyground and its built-in tools. No development setup required.</p></div>
+          <div class="route-node"><h4>Cloud Build</h4><p>We create your game build in the cloud and publish it automatically.</p></div>
+          <div class="route-card"><h4>Why it matters</h4><p>The most convinient way to create a playable web experience. Will run on any device. May incur additional costs for cloud hosting.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-banner">Monetization Layer</div>
+      <div class="sec-tagline">The live game becomes a revenue surface, not just a final export</div>
+    </div>
+    <div class="monetization-grid">
+      <div class="mono-card">
+        <div class="mono-icon">▶</div>
+        <div class="mono-title">Automatic Ads</div>
+        <div class="mono-body">Live experiences can display ads as part of the platform flow, allowing monetization to activate automatically once the game is published.</div>
+      </div>
+      <div class="mono-card">
+        <div class="mono-icon">◎</div>
+        <div class="mono-title">Platform Economy</div>
+        <div class="mono-body">Beyond ads, other earning models can exist inside the Plyground economy, extending monetization beyond a single revenue mechanism.</div>
+      </div>
+      <div class="mono-card">
+        <div class="mono-icon">↗</div>
+        <div class="mono-title">Shareable Reach</div>
+        <div class="mono-body">A web game link turns the project into a distribution-ready experience that can be shared broadly and accessed across devices.</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-logo">
+        <img src="/assets/Plyground_Logo_2DIcon_Color_v2.svg" alt="Plyground logo" width="32" height="32" />
+        <span class="footer-wordmark">plyground</span>
+      </div>
+      <div class="footer-tagline">Multi-system orchestration · assets, systems, AI, and monetization in one flow</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const flowData = {
+    logic: {
+      kicker: 'System Layer',
+      title: 'Logic System',
+      body: 'Rules, triggers, and feature behavior belong to the logic system. AI helps convert creator intent into structured actions, so gameplay logic can be assembled in a way the platform can execute.',
+      points: [
+        ['Intent to rules', 'A creator request can be translated into events, states, conditions, or system updates rather than left as unstructured text.'],
+        ['Unity-ready direction', 'The orchestration layer is designed to support real game behavior, not just decorative scene changes.']
+      ],
+      note: 'AI acts as a translator between what the creator wants and the actions the system can actually perform.'
+    },
+    gameplay: {
+      kicker: 'System Layer',
+      title: 'Gameplay System',
+      body: 'Gameplay connects player actions, responses, objectives, and feedback loops. In Plyground, assets are not just visual props — they can participate in the actual play structure of the experience.',
+      points: [
+        ['Playable composition', 'Assets can become part of objectives, interactions, scoring, and progression.'],
+        ['Coordinated behavior', 'The platform keeps gameplay connected to the rest of the project instead of treating it as a separate silo.']
+      ],
+      note: 'The goal is not to place objects only, but to assemble systems that behave like a game.'
+    },
+    world: {
+      kicker: 'System Layer',
+      title: 'World System',
+      body: 'The world system organizes scenes, layout, environmental structure, and placement. A Unity-like 3D editor lets the creator populate the scene while Plyground maintains the project-level connections underneath.',
+      points: [
+        ['Scene-based authoring', 'Creators work visually in space while the platform preserves the structure behind the scene.'],
+        ['Asset-aware placement', 'Placed content remains part of a broader connected project, not a disconnected snapshot.']
+      ],
+      note: 'The scene is where orchestration becomes visible.'
+    },
+    characters: {
+      kicker: 'System Layer',
+      title: 'Character System',
+      body: 'Characters, avatars, enemies, and role-based entities can be coordinated as their own system. This includes how they are represented, configured, and connected to gameplay and world logic.',
+      points: [
+        ['Game-ready entities', 'Characters can be more than art assets; they can carry behaviors, roles, and interactions.'],
+        ['Cross-system coordination', 'Character state can tie back into rules, progression, and monetization surfaces.']
+      ],
+      note: 'Plyground treats character content as part of the system network, not an isolated model library.'
+    },
+    social: {
+      kicker: 'System Layer',
+      title: 'Social System',
+      body: 'Experiences can include creator identity, player connection, and community-facing features. Social presence is part of the product surface, not something bolted on after the game is already built.',
+      points: [
+        ['Creator-facing context', 'A project can live inside a broader social and platform ecosystem.'],
+        ['System continuity', 'The game remains connected to its creator and audience context even after publication.']
+      ],
+      note: 'A live game on Plyground is also a live platform object.'
+    },
+    economy: {
+      kicker: 'System Layer',
+      title: 'Economy System',
+      body: 'Assets, creator participation, and platform-level value can connect into the economy layer. This gives the project commercial continuity beyond the moment of publishing.',
+      points: [
+        ['Asset value chain', 'Assets can matter economically as part of a larger creator ecosystem.'],
+        ['Platform-native upside', 'The project can participate in monetization models that are native to Plyground.']
+      ],
+      note: 'The economy layer extends the game from a build output into an ecosystem participant.'
+    },
+    monetization: {
+      kicker: 'System Layer',
+      title: 'Monetization System',
+      body: 'Once the experience is live, monetization does not have to be a separate project. Plyground can connect the hosted game to ad display and related revenue paths automatically.',
+      points: [
+        ['Ads in the live loop', 'Monetization can activate once the game is published and running.'],
+        ['Less operational friction', 'Creators can focus on building while the platform supports monetization infrastructure.']
+      ],
+      note: 'Publishing and monetization are designed to connect directly.'
+    },
+    agents: {
+      kicker: 'System Layer',
+      title: 'Agents / NPCs',
+      body: 'Non-player entities, background behavior, and AI-driven presence can be coordinated as their own system. This gives the experience a way to feel alive while staying linked to the rest of the project.',
+      points: [
+        ['Behavioral layer', 'NPCs and agents can connect to world state, gameplay events, and scene logic.'],
+        ['System-aware presence', 'These entities are orchestrated within the same project framework rather than assembled ad hoc.']
+      ],
+      note: 'AI can help drive how these entities are connected, configured, and deployed.'
+    },
+    assets: {
+      kicker: 'System Layer',
+      title: 'Asset Graph',
+      body: 'At the foundation is the asset graph: the linked collection of content that makes the experience possible. Plyground understands assets as part of a connected structure rather than a pile of independent files.',
+      points: [
+        ['Linked building blocks', 'Assets can connect to systems, placement, behavior, and monetization outcomes.'],
+        ['Orchestration-ready', 'Because assets are connected, AI can help route them into the right roles inside the game.']
+      ],
+      note: 'This is the substrate the rest of the orchestration layer works on top of.'
+    }
+  };
+
+  const flowTitle = document.getElementById('flowTitle');
+  const flowKicker = document.getElementById('flowKicker');
+  const flowBody = document.getElementById('flowBody');
+  const flowPoints = document.getElementById('flowPoints');
+  const flowNote = document.getElementById('flowNote');
+
+  function renderFlow(key) {
+    const data = flowData[key];
+    if (!data) return;
+    flowKicker.textContent = data.kicker;
+    flowTitle.textContent = data.title;
+    flowBody.textContent = data.body;
+    flowPoints.innerHTML = data.points.map(([title, body]) => `
+      <div class="flow-point">
+        <h4>${title}</h4>
+        <p>${body}</p>
+      </div>
+    `).join('');
+    flowNote.textContent = data.note;
+    document.querySelectorAll('.sector').forEach(el => {
+      el.classList.toggle('active', el.dataset.flow === key);
+    });
+  }
+
+  document.querySelectorAll('.sector').forEach(el => {
+    el.addEventListener('mouseenter', () => renderFlow(el.dataset.flow));
+    el.addEventListener('click', () => renderFlow(el.dataset.flow));
+    el.addEventListener('focus', () => renderFlow(el.dataset.flow));
+  });
+
+  function showRoute(id, btn) {
+    document.querySelectorAll('.scenario-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('route-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  renderFlow('logic');
+</script>
+</body>
+</html>

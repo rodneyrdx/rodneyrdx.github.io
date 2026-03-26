@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Plyground — IP Protection for Asset Creators</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800;900&family=Barlow:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #151515;
+    --teal: #3dbf8a;
+    --teal-dark: #2a9e6e;
+    --magenta: #c0186a;
+    --pink: #e040a0;
+    --orange: #f5a623;
+    --gold: #f5c842;
+    --white: #ffffff;
+    --off-white: #e8e8e8;
+    --muted: rgba(255,255,255,0.48);
+    --card-bg: rgba(255,255,255,0.93);
+    --card-text: #1a1a1a;
+    --surface-dark: rgba(255,255,255,0.06);
+    --line: rgba(255,255,255,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    overflow-x: hidden;
+  }
+
+  .page { position: relative; min-height: 100vh; }
+  .hex-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .hex-bg svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.18;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 56px 36px 84px;
+  }
+
+  .deck-header {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 52px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .logo-mark { width: 76px; height: 76px; flex-shrink: 0; }
+
+  .footer-logo img,
+  .logo-mark { display: block; object-fit: contain; }
+
+  .section-banner {
+    display: inline-block;
+    background: var(--teal);
+    color: var(--white);
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  .page-title {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: clamp(34px, 5vw, 54px);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .page-subtitle {
+    font-size: 15px;
+    color: var(--orange);
+    font-weight: 700;
+    margin-top: 8px;
+    font-family: 'Exo 2', sans-serif;
+  }
+
+  .sec-head {
+    text-align: center;
+    margin-bottom: 28px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .sec-banner {
+    display: inline-block;
+    background: var(--teal);
+    color: var(--white);
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: clamp(18px, 3vw, 28px);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 36px;
+    border-radius: 6px;
+  }
+
+  .sec-tagline {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--orange);
+    margin-top: 12px;
+    font-family: 'Exo 2', sans-serif;
+    text-align: center;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 18px;
+    margin-bottom: 52px;
+  }
+
+  .hero-panel,
+  .hero-stats,
+  .info-card,
+  .distribution-panel,
+  .scenario-panel,
+  .step-card,
+  .callout,
+  .matrix-table,
+  .protection-bar {
+    background: var(--card-bg);
+    color: var(--card-text);
+    border-radius: 12px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .hero-panel {
+    padding: 30px 30px 26px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(61,191,138,0.16), transparent 42%);
+    pointer-events: none;
+  }
+
+  .hero-title {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 18px;
+    color: var(--teal-dark);
+    margin-bottom: 14px;
+  }
+
+  .hero-copy {
+    color: #505050;
+    font-size: 14px;
+    line-height: 1.7;
+    font-weight: 400;
+    margin-bottom: 18px;
+    max-width: 95%;
+  }
+
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .pill {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 9px 12px;
+    border-radius: 999px;
+    background: rgba(61,191,138,0.12);
+    color: var(--teal-dark);
+  }
+
+  .hero-stats {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stat-box {
+    background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(245,245,245,0.95));
+    border-radius: 10px;
+    padding: 22px 16px;
+    text-align: center;
+    min-height: 138px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .stat-box:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,0.12); }
+
+  .stat-kicker {
+    font-family: 'Exo 2', sans-serif;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: #777;
+    margin-bottom: 8px;
+    font-weight: 800;
+  }
+
+  .stat-value {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 40px;
+    line-height: 1;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+
+  .stat-value.teal { color: var(--teal-dark); }
+  .stat-value.magenta { color: var(--magenta); }
+  .stat-value.orange { color: #bb7a00; }
+  .stat-value.dark { color: #202020; }
+
+  .stat-note {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.45;
+    font-weight: 300;
+  }
+
+  .protection-bar {
+    padding: 32px;
+    margin-bottom: 52px;
+  }
+
+  .bar-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 20px;
+  }
+  .bar-label-row span {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #666;
+  }
+
+  .bar-track {
+    display: flex;
+    gap: 3px;
+    height: 58px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+
+  .bar-seg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 15px;
+    color: rgba(0,0,0,0.65);
+    transition: filter 0.2s;
+  }
+  .bar-seg:hover { filter: brightness(1.08); }
+
+  .bar-legend {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .leg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #444;
+    font-family: 'Exo 2', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  .leg-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  .split-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 52px;
+  }
+
+  .info-card {
+    padding: 28px 22px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .info-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.15); }
+
+  .card-icon {
+    width: 42px;
+    height: 42px;
+    margin: 0 auto 14px;
+    display: block;
+  }
+
+  .card-pct {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 50px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .card-role {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2a2a2a;
+    margin-bottom: 10px;
+  }
+
+  .card-note {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .card-pct.teal { color: var(--teal-dark); }
+  .card-pct.magenta { color: var(--magenta); }
+  .card-pct.orange { color: var(--orange); }
+
+  .scenario-block { margin-bottom: 52px; animation: fadeUp 0.5s ease both; }
+
+  .tab-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 9px 22px;
+    border-radius: 6px;
+    border: 2px solid rgba(255,255,255,0.12);
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #000;
+  }
+
+  .tab-btn:hover:not(.active) {
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  .scenario-panel {
+    display: none;
+    padding: 32px;
+  }
+  .scenario-panel.active { display: block; }
+
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 0.88fr 1.12fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .scenario-copy h3 {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    text-transform: uppercase;
+    color: var(--teal-dark);
+    margin-bottom: 10px;
+  }
+
+  .scenario-copy p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 14px;
+  }
+
+  .mini-points {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mini-point {
+    background: #f6f6f6;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #555;
+    line-height: 1.55;
+    border-left: 4px solid var(--teal);
+  }
+
+  .sc-rows { display: flex; flex-direction: column; gap: 14px; }
+  .sc-row {
+    display: grid;
+    grid-template-columns: 136px 1fr 64px;
+    align-items: center;
+    gap: 14px;
+  }
+  .sc-row-label {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #555;
+  }
+  .sc-row-track {
+    height: 12px;
+    background: #e7e7e7;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .sc-row-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+  .sc-row-pct {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    text-align: right;
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 52px;
+  }
+
+  .step-card {
+    position: relative;
+    padding: 26px 22px;
+    transition: transform 0.2s;
+  }
+
+  .step-card:hover { transform: translateY(-3px); }
+
+  .step-num-bg {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 56px;
+    line-height: 1;
+    color: rgba(0,0,0,0.05);
+    margin-bottom: 4px;
+  }
+
+  .step-title {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--teal-dark);
+    margin-bottom: 8px;
+  }
+
+  .step-desc {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .steps-grid .step-card:not(:last-child)::after {
+    content: '▶';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--teal);
+    font-size: 14px;
+    z-index: 2;
+  }
+
+  .matrix-table {
+    overflow: hidden;
+    margin-bottom: 52px;
+  }
+
+  .mt-head,
+  .mt-row {
+    display: grid;
+    grid-template-columns: 170px 1fr 1fr 1fr;
+    gap: 0;
+  }
+
+  .mt-head {
+    background: var(--teal);
+  }
+
+  .mt-head span {
+    padding: 16px 18px;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #000;
+  }
+
+  .mt-row {
+    border-bottom: 1px solid #ececec;
+  }
+
+  .mt-row:last-child { border-bottom: none; }
+  .mt-row > div {
+    padding: 18px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.55;
+    display: flex;
+    align-items: center;
+  }
+
+  .mt-row .kind {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #222;
+    background: #fafafa;
+  }
+
+  .callouts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 52px;
+  }
+
+  .callout {
+    padding: 30px 26px;
+    border-left: 5px solid var(--teal);
+    transition: transform 0.2s;
+  }
+
+  .callout:nth-child(2) { border-left-color: var(--orange); }
+  .callout:hover { transform: translateY(-3px); }
+
+  .callout-emoji { font-size: 26px; margin-bottom: 12px; }
+  .callout-title {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--teal-dark);
+    margin-bottom: 8px;
+  }
+  .callout:nth-child(2) .callout-title { color: #b07300; }
+  .callout-body {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .footer-wordmark {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    background: linear-gradient(90deg, #3dbf8a, #5dd8a8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.03em;
+  }
+
+  .footer-tagline {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Exo 2', sans-serif;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .content > * { animation: fadeUp 0.5s ease both; }
+  .content > *:nth-child(1) { animation-delay: 0.05s; }
+  .content > *:nth-child(2) { animation-delay: 0.1s; }
+  .content > *:nth-child(3) { animation-delay: 0.15s; }
+  .content > *:nth-child(4) { animation-delay: 0.2s; }
+  .content > *:nth-child(5) { animation-delay: 0.25s; }
+  .content > *:nth-child(6) { animation-delay: 0.3s; }
+  .content > *:nth-child(7) { animation-delay: 0.35s; }
+  .content > *:nth-child(8) { animation-delay: 0.4s; }
+  .content > *:nth-child(9) { animation-delay: 0.45s; }
+
+  @media (max-width: 900px) {
+    .hero-grid,
+    .scenario-grid,
+    .callouts { grid-template-columns: 1fr; }
+    .split-row { grid-template-columns: 1fr; }
+    .steps-grid { grid-template-columns: 1fr 1fr; }
+    .mt-head, .mt-row { grid-template-columns: 120px 1fr 1fr 1fr; }
+  }
+
+  @media (max-width: 680px) {
+    .content { padding: 42px 18px 64px; }
+    .deck-header { flex-direction: column; align-items: flex-start; }
+    .hero-stats { grid-template-columns: 1fr; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .step-card::after { display: none; }
+    .bar-label-row,
+    .footer { flex-direction: column; align-items: flex-start; }
+    .mt-head, .mt-row {
+      grid-template-columns: 1fr;
+    }
+    .mt-head span { border-bottom: 1px solid rgba(0,0,0,0.08); }
+    .mt-row > div.kind { border-bottom: 1px solid #ececec; }
+    .sc-row { grid-template-columns: 94px 1fr 52px; }
+  }
+</style>
+</head>
+<body>
+<div class="hex-bg">
+  <svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="diamonds" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+        <rect x="10" y="10" width="60" height="60" rx="4" fill="none" stroke="#3dbf8a" stroke-width="0.8" transform="rotate(45 40 40)"/>
+        <rect x="22" y="22" width="36" height="36" rx="2" fill="none" stroke="#c0186a" stroke-width="0.4" transform="rotate(45 40 40)"/>
+      </pattern>
+      <radialGradient id="fade" cx="50%" cy="50%" r="70%">
+        <stop offset="0%" stop-color="white" stop-opacity="1"/>
+        <stop offset="100%" stop-color="white" stop-opacity="0.1"/>
+      </radialGradient>
+      <mask id="vmask">
+        <rect width="1000" height="700" fill="url(#fade)"/>
+      </mask>
+    </defs>
+    <rect width="1000" height="700" fill="url(#diamonds)" mask="url(#vmask)"/>
+    <g opacity="0.35">
+      <rect x="-30" y="60" width="90" height="90" rx="8" fill="#7a0040" transform="rotate(45 15 105)"/>
+      <rect x="-60" y="160" width="70" height="70" rx="6" fill="#7a0040" transform="rotate(45 -25 195)"/>
+      <rect x="20" y="200" width="55" height="55" rx="5" fill="none" stroke="#7a0040" stroke-width="2" transform="rotate(45 47 227)"/>
+      <rect x="-10" y="300" width="75" height="75" rx="7" fill="#7a0040" transform="rotate(45 27 337)"/>
+    </g>
+    <g opacity="0.12">
+      <rect x="900" y="50" width="80" height="80" rx="6" fill="#3dbf8a" transform="rotate(45 940 90)"/>
+      <rect x="850" y="150" width="60" height="60" rx="5" fill="#3dbf8a" transform="rotate(45 880 180)"/>
+    </g>
+  </svg>
+</div>
+
+<div class="page">
+  <div class="content">
+    <div class="deck-header">
+      <img class="logo-mark" src="/assets/Plyground_Logo_2DIcon_Color_v2.svg" alt="Plyground logo" />
+      <div class="header-text">
+        <div class="section-banner">Creator Rights Framework</div>
+        <div class="page-title">IP Protection for<br>Asset Creators</div>
+        <div class="page-subtitle">How Plyground protects ownership, controls distribution, and restricts misuse</div>
+      </div>
+    </div>
+
+    <div class="hero-grid">
+      <div class="hero-panel">
+        <div class="hero-title">Core Principle</div>
+        <div class="hero-copy">
+          Asset creators keep ownership of the intellectual property they publish. Plyground receives only a limited, non-exclusive license to host metadata and previews, display assets on the platform, enable permitted use inside Plyground experiences, and operate the technical systems needed to run the ecosystem.
+        </div>
+        <div class="pill-row">
+          <div class="pill">Ownership Stays With Creator</div>
+          <div class="pill">Use Governed By Creator License</div>
+          <div class="pill">No AI Training Without Opt-In</div>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-box">
+          <div class="stat-kicker">Ownership</div>
+          <div class="stat-value teal">100%</div>
+          <div class="stat-note">Publishing to Plyground does not transfer IP ownership to the platform or to other users.</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-kicker">AI Training Default</div>
+          <div class="stat-value magenta">Opt‑In</div>
+          <div class="stat-note">Creator-published assets are not used to train Plyground generative AI models unless the creator separately agrees.</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-kicker">Secure Asset Delivery</div>
+          <div class="stat-value orange">Cloud</div>
+          <div class="stat-note">Secure assets are available only through Plyground-managed cloud builds and are never distributed to client devices.</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-kicker">Misuse Enforcement</div>
+          <div class="stat-value dark">Report</div>
+          <div class="stat-note">Creators can report IP violations, and Plyground may restrict or remove infringing content and suspend repeat offenders.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-banner">Protection Layers</div>
+      <div class="sec-tagline">A creator’s rights are protected through ownership, licensing, distribution controls, and enforcement</div>
+    </div>
+
+    <div class="protection-bar">
+      <div class="bar-label-row">
+        <span>End-to-end creator protection flow</span>
+        <span>From upload to enforcement</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-seg" style="width:24%; background:#3dbf8a; border-radius:6px 0 0 6px;">Ownership</div>
+        <div class="bar-seg" style="width:25%; background:#5dcaa0;">Licensing</div>
+        <div class="bar-seg" style="width:28%; background:#f5a623;">Distribution Control</div>
+        <div class="bar-seg" style="width:23%; background:#c0186a; border-radius:0 6px 6px 0; color:rgba(255,255,255,0.92)">Enforcement</div>
+      </div>
+      <div class="bar-legend">
+        <div class="leg"><div class="leg-dot" style="background:#3dbf8a"></div>Creator retains IP</div>
+        <div class="leg"><div class="leg-dot" style="background:#5dcaa0"></div>Creator defines asset license</div>
+        <div class="leg"><div class="leg-dot" style="background:#f5a623"></div>Public / Secure / Commercial delivery</div>
+        <div class="leg"><div class="leg-dot" style="background:#c0186a"></div>Reports, restrictions, account action</div>
+      </div>
+    </div>
+
+    <div class="split-row">
+      <div class="info-card">
+        <svg class="card-icon" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M18 5 7 10v8c0 7 5 11 11 13 6-2 11-6 11-13v-8L18 5Z" fill="none" stroke="#3dbf8a" stroke-width="2.5"/><path d="M14 18l3 3 6-7" fill="none" stroke="#3dbf8a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="card-pct teal">IP</div>
+        <div class="card-role">Ownership Preserved</div>
+        <div class="card-note">Creators retain full intellectual property rights in the assets they publish or reference on the platform. Plyground does not take ownership.</div>
+      </div>
+      <div class="info-card">
+        <svg class="card-icon" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><rect x="7" y="8" width="22" height="20" rx="4" fill="none" stroke="#c0186a" stroke-width="2.5"/><path d="M12 14h12M12 18h12M12 22h8" stroke="#c0186a" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div class="card-pct magenta">3</div>
+        <div class="card-role">Distribution Models</div>
+        <div class="card-note">Assets can be published as Public, Secure, or Commercial so creators can choose the balance between reach, monetization, and file protection.</div>
+      </div>
+      <div class="info-card">
+        <svg class="card-icon" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="11" fill="none" stroke="#f5a623" stroke-width="2.5"/><path d="M18 12v7l4 3" stroke="#f5a623" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="card-pct orange">24/7</div>
+        <div class="card-role">Protection Continues</div>
+        <div class="card-note">Safeguards apply during hosting, build generation, platform use, AI policy, and post-publication enforcement when violations are reported.</div>
+      </div>
+    </div>
+
+    <div class="scenario-block">
+      <div class="sec-head">
+        <div class="sec-banner">Choose Your Protection Model</div>
+        <div class="sec-tagline">Different asset types give creators different levels of exposure and control</div>
+      </div>
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="showMode('public', this)">Public Assets</button>
+        <button class="tab-btn" onclick="showMode('secure', this)">Secure Assets</button>
+        <button class="tab-btn" onclick="showMode('commercial', this)">Commercial Assets</button>
+      </div>
+
+      <div class="scenario-panel active" id="mode-public">
+        <div class="scenario-grid">
+          <div class="scenario-copy">
+            <h3>Public Assets</h3>
+            <p>Best for creators who want their assets broadly available inside the Plyground ecosystem and who accept that local builds may download the asset to the user’s device as part of the build process.</p>
+            <div class="mini-points">
+              <div class="mini-point">Included in both local builds and cloud builds.</div>
+              <div class="mini-point">Participates in Plyground revenue sharing.</div>
+              <div class="mini-point">Highest accessibility, with lower file containment than secure delivery.</div>
+            </div>
+          </div>
+          <div class="sc-rows">
+            <div class="sc-row">
+              <div class="sc-row-label">Access</div>
+              <div class="sc-row-track"><div class="sc-row-fill" style="width:95%; background:#3dbf8a"></div></div>
+              <div class="sc-row-pct" style="color:#3dbf8a">95</div>
+            </div>
+            <div class="sc-row">
+              <div class="sc-row-label">Reach</div>
+              <div class="sc-row-track"><div class="sc-row-fill" style="width:92%; background:#5dcaa0"></div></div>
+              <div class="sc-row-pct" style="color:#2a9e6e">92</div>
+            </div>
+            <div class="sc-row">
+              <div class="sc-row-label">File Shielding</div>
+              <div class="sc-row-track"><div class="sc-row-fill" style="width:38%; background:#f5a623"></div></div>
+              <div class="sc-row-pct" style="color:#f5a623">38</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scenario-panel" id="mode-secure">
+        <div class="scenario-grid">
+          <div class="scenario-copy">
+            <h3>Secure Assets</h3>
+            <p>Best for creators who want stronger protection of the underlying files. Secure assets are only available through Plyground-managed cloud build systems and are never distributed to client devices.</p>
+            <div class="mini-points">
+              <div class="mini-point">Requires Plyground cloud infrastructure to build experiences using the asset.</div>
+              <div class="mini-point">Participates in Plyground revenue sharing.</div>
+              <div class="mini-point">Maximum emphasis on IP protection and controlled access.</div>
+            </div>
+          </div>
+          <div class="sc-rows">
+            <div class="sc-row">
+              <div class="sc-row-label">Access</div>
+              <div class="sc-row-track"><div class="sc-row-fill" style="width:62%; background:#3dbf8a"></div></div>
+              <div class="sc-row-pct" style="color:#3dbf8a">62</div>
+            </div>
+            <div class="sc-row">
+              <div class="sc-row-label">Reach</div>
+              <div class="sc-row-track"><div class="sc-row-fill" style="width:70%; background:#5dcaa0"></div></div>
+              <div class="sc-row-pct" style="color:#2a9e6e">70</div>
+            </div>
+            <div class="sc-row">
+              <div class="sc-row-label">File Shielding</div>
+              <div class="sc-row-track"><div class="sc-row-fill" style="width:97%; background:#f5a623"></div></div>
+              <div class="sc-row-pct" style="color:#f5a623">97</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scenario-panel" id="mode-commercial">
+        <div class="scenario-grid">
+          <div class="scenario-copy">
+            <h3>Commercial Assets</h3>
+            <p>Best for creators selling through third-party marketplaces. Plyground only references metadata; the underlying files stay outside the platform and users must acquire the asset through the external store before building.</p>
+            <div class="mini-points">
+              <div class="mini-point">Underlying asset files are not uploaded to Plyground.</div>
+              <div class="mini-point">No Plyground revenue-share participation because licensing happens externally.</div>
+              <div class="mini-point">Strong distribution control while keeping marketplace licensing terms intact.</div>
+            </div>
+          </div>
+          <div class="sc-rows">
+            <div class="sc-row">
+              <div class="sc-row-label">Access</div>
+              <div class="sc-row-track"><div class="sc-row-fill" style="width:50%; background:#3dbf8a"></div></div>
+              <div class="sc-row-pct" style="color:#3dbf8a">50</div>
+            </div>
+            <div class="sc-row">
+              <div class="sc-row-label">Reach</div>
+              <div class="sc-row-track"><div class="sc-row-fill" style="width:66%; background:#5dcaa0"></div></div>
+              <div class="sc-row-pct" style="color:#2a9e6e">66</div>
+            </div>
+            <div class="sc-row">
+              <div class="sc-row-label">File Shielding</div>
+              <div class="sc-row-track"><div class="sc-row-fill" style="width:99%; background:#f5a623"></div></div>
+              <div class="sc-row-pct" style="color:#f5a623">99</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-banner">Protection Process</div>
+      <div class="sec-tagline">The agreement protects creators before upload, during distribution, and after violations</div>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num-bg">01</div>
+        <div class="step-title">Publish Under Your Terms</div>
+        <div class="step-desc">The creator defines who can use the asset, whether it can be modified, and whether commercial use is allowed.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num-bg">02</div>
+        <div class="step-title">Select Distribution Model</div>
+        <div class="step-desc">Each asset can be designated Public, Secure, or Commercial depending on how much access and protection the creator wants.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num-bg">03</div>
+        <div class="step-title">Apply Technical Safeguards</div>
+        <div class="step-desc">Plyground may use controlled build pipelines, asset packaging protections, licensing enforcement, and cloud systems to reduce extraction risk.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num-bg">04</div>
+        <div class="step-title">Enforce Creator Rights</div>
+        <div class="step-desc">Creators can report violations, and Plyground may remove infringing content, restrict access, and suspend repeat offenders.</div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-banner">Asset Protection Matrix</div>
+      <div class="sec-tagline">How each model handles files, builds, licensing, and monetization</div>
+    </div>
+    <div class="matrix-table">
+      <div class="mt-head">
+        <span>Asset Type</span>
+        <span>File Delivery</span>
+        <span>Build Access</span>
+        <span>Revenue / Licensing</span>
+      </div>
+      <div class="mt-row">
+        <div class="kind">Public</div>
+        <div>Asset may be downloaded to the user’s device as part of local build delivery.</div>
+        <div>Available for both local builds and cloud builds.</div>
+        <div>Participates in Plyground revenue sharing.</div>
+      </div>
+      <div class="mt-row">
+        <div class="kind">Secure</div>
+        <div>Underlying asset is not distributed to client devices.</div>
+        <div>Only accessible through Plyground-managed cloud builds.</div>
+        <div>Participates in Plyground revenue sharing.</div>
+      </div>
+      <div class="mt-row">
+        <div class="kind">Commercial</div>
+        <div>Underlying files are not uploaded to Plyground at all; only metadata is referenced.</div>
+        <div>User must acquire the asset through the external marketplace before build completion.</div>
+        <div>Licensing and monetization remain governed by the external marketplace, not Plyground revenue share.</div>
+      </div>
+    </div>
+
+    <div class="callouts">
+      <div class="callout">
+        <div class="callout-emoji">🤖</div>
+        <div class="callout-title">AI Data Protection</div>
+        <div class="callout-body">Creator-published assets are not used to train Plyground’s generative AI models unless the creator explicitly opts in through a separate program. The agreement also prohibits users from using platform assets to train generative AI models without permission.</div>
+      </div>
+      <div class="callout">
+        <div class="callout-emoji">🚫</div>
+        <div class="callout-title">Prohibited Uses</div>
+        <div class="callout-body">Users may not extract assets for reuse outside the creator’s license, scrape or download assets through automated systems, redistribute assets beyond permitted terms, or use them for AI training without authorization.</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-logo">
+        <img src="/assets/Plyground_Logo_2DIcon_Color_v2.svg" alt="Plyground logo" width="32" height="32" />
+        <span class="footer-wordmark">plyground</span>
+      </div>
+      <div class="footer-tagline">IP Protection for Asset Creators · Ownership, Licensing, Control, Enforcement</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showMode(id, btn) {
+    document.querySelectorAll('.scenario-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('mode-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

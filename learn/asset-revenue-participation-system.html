@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plyground — Asset Revenue Participation System</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800;900&family=Barlow:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #151515;
+    --teal: #3dbf8a;
+    --teal-dark: #2a9e6e;
+    --magenta: #c0186a;
+    --pink: #e040a0;
+    --orange: #f5a623;
+    --gold: #f5c842;
+    --white: #ffffff;
+    --off-white: #e8e8e8;
+    --muted: rgba(255,255,255,0.45);
+    --card-bg: rgba(255,255,255,0.93);
+    --card-text: #1a1a1a;
+    --surface-dark: rgba(255,255,255,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ═══════════════════════════════════════
+     DIAMOND HEX BACKGROUND PATTERN
+  ═══════════════════════════════════════ */
+  .page {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .hex-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* SVG diamond tiles rendered as background */
+  .hex-bg svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.18;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 56px 36px 80px;
+  }
+
+  /* ═══════════════════════════════════════
+     HEADER BANNER (matches deck style)
+  ═══════════════════════════════════════ */
+  .deck-header {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 52px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  /* Plyground "P" logo mark recreation */
+  .logo-mark {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+  }
+
+  .footer-logo img,
+  .logo-mark {
+    display: block;
+    object-fit: contain;
+  }
+
+  .header-text {}
+
+  .section-banner {
+    display: inline-block;
+    background: var(--teal);
+    color: var(--white);
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+
+  .page-title {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: clamp(34px, 5vw, 52px);
+    line-height: 1.0;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+
+  .page-subtitle {
+    font-size: 15px;
+    color: var(--orange);
+    font-weight: 700;
+    margin-top: 6px;
+    font-family: 'Exo 2', sans-serif;
+  }
+
+  /* ═══════════════════════════════════════
+     SECTION HEADERS (teal banner style)
+  ═══════════════════════════════════════ */
+  .sec-head {
+    text-align: center;
+    margin-bottom: 28px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .sec-banner {
+    display: inline-block;
+    background: var(--teal);
+    color: var(--white);
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: clamp(18px, 3vw, 28px);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 36px;
+    border-radius: 6px;
+  }
+
+  .sec-tagline {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--orange);
+    margin-top: 12px;
+    font-family: 'Exo 2', sans-serif;
+    text-align: center;
+  }
+
+  /* ═══════════════════════════════════════
+     BASE SPLIT — 3 white cards (deck style)
+  ═══════════════════════════════════════ */
+  .split-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 52px;
+  }
+
+  .split-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--card-text);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .split-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  }
+
+  .split-card .card-icon {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 14px;
+    display: block;
+  }
+
+  .split-card .card-pct {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .split-card.platform .card-pct { color: var(--teal-dark); }
+  .split-card.creator .card-pct  { color: var(--magenta); }
+  .split-card.asset .card-pct    { color: var(--orange); }
+
+  .split-card .card-role {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  .split-card .card-note {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  /* ═══════════════════════════════════════
+     REVENUE BAR (full-width visual)
+  ═══════════════════════════════════════ */
+  .bar-section {
+    background: var(--surface-dark);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 52px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .bar-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .bar-label-row span {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .bar-track {
+    display: flex;
+    height: 52px;
+    border-radius: 8px;
+    overflow: hidden;
+    gap: 3px;
+    margin-bottom: 18px;
+  }
+
+  .bar-seg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 17px;
+    color: rgba(0,0,0,0.55);
+    cursor: default;
+    transition: filter 0.2s;
+    border-radius: 4px;
+  }
+  .bar-seg:hover { filter: brightness(1.12); }
+
+  .bar-legend {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .leg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--off-white);
+    font-family: 'Exo 2', sans-serif;
+    letter-spacing: 0.05em;
+  }
+  .leg-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  /* ═══════════════════════════════════════
+     SCENARIO TABS
+  ═══════════════════════════════════════ */
+  .scenario-block {
+    margin-bottom: 52px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .tab-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 9px 22px;
+    border-radius: 6px;
+    border: 2px solid rgba(255,255,255,0.12);
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #000;
+  }
+  .tab-btn:hover:not(.active) {
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  .scenario-panel {
+    display: none;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 32px;
+    color: var(--card-text);
+  }
+  .scenario-panel.active { display: block; }
+
+  .sc-bar {
+    display: flex;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    gap: 3px;
+    margin-bottom: 24px;
+  }
+
+  .sc-rows { display: flex; flex-direction: column; gap: 14px; }
+  .sc-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 56px;
+    align-items: center;
+    gap: 14px;
+  }
+  .sc-row-label {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #555;
+  }
+  .sc-row-track {
+    height: 10px;
+    background: #e5e5e5;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .sc-row-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+  .sc-row-pct {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    text-align: right;
+  }
+  .sc-note {
+    margin-top: 18px;
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+    font-weight: 300;
+    border-top: 1px solid #e5e5e5;
+    padding-top: 14px;
+  }
+
+  /* ═══════════════════════════════════════
+     PROCESS STEPS (white cards)
+  ═══════════════════════════════════════ */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 52px;
+  }
+
+  .step-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 26px 22px;
+    color: var(--card-text);
+    position: relative;
+    animation: fadeUp 0.5s ease both;
+    transition: transform 0.2s;
+  }
+  .step-card:hover { transform: translateY(-3px); }
+
+  .step-num-bg {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 56px;
+    line-height: 1;
+    color: rgba(0,0,0,0.05);
+    margin-bottom: 4px;
+  }
+  .step-title {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--teal-dark);
+    margin-bottom: 8px;
+  }
+  .step-desc {
+    font-size: 12px;
+    color: #555;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* arrow connectors */
+  .steps-grid .step-card:not(:last-child)::after {
+    content: '▶';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--teal);
+    font-size: 14px;
+    z-index: 2;
+  }
+
+  /* ═══════════════════════════════════════
+     ASSET TABLE
+  ═══════════════════════════════════════ */
+  .asset-section {
+    margin-bottom: 52px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .asset-table {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    color: var(--card-text);
+  }
+
+  .at-head {
+    display: grid;
+    grid-template-columns: 1fr 90px 90px 1fr;
+    background: var(--teal);
+    padding: 14px 28px;
+  }
+  .at-head span {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #000;
+  }
+
+  .at-row {
+    display: grid;
+    grid-template-columns: 1fr 90px 90px 1fr;
+    padding: 18px 28px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+    transition: background 0.15s;
+  }
+  .at-row:last-child { border-bottom: none; }
+  .at-row:hover { background: rgba(61,191,138,0.06); }
+
+  .at-name {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #222;
+  }
+  .at-pct {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .at-pct.min { color: rgba(192,24,106,0.55); }
+  .at-pct.max { color: var(--magenta); }
+
+  .at-range {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 12px;
+  }
+  .range-track {
+    flex: 1;
+    height: 8px;
+    background: #ececec;
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+  }
+  .range-fill {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(192,24,106,0.3), var(--magenta));
+    border-radius: 99px;
+  }
+
+  /* ═══════════════════════════════════════
+     CALLOUT CARDS (like deck's info boxes)
+  ═══════════════════════════════════════ */
+  .callouts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 52px;
+  }
+
+  .callout {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 30px 26px;
+    color: var(--card-text);
+    border-left: 5px solid var(--teal);
+    animation: fadeUp 0.5s ease both;
+    transition: transform 0.2s;
+  }
+  .callout:hover { transform: translateY(-3px); }
+  .callout:nth-child(2) { border-left-color: var(--orange); }
+
+  .callout-emoji { font-size: 26px; margin-bottom: 12px; }
+  .callout-title {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--teal-dark);
+    margin-bottom: 8px;
+  }
+  .callout:nth-child(2) .callout-title { color: #b07300; }
+  .callout-body {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* ═══════════════════════════════════════
+     FOOTER
+  ═══════════════════════════════════════ */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .footer-wordmark {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 24px;
+    background: linear-gradient(90deg, #3dbf8a, #5dd8a8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.03em;
+  }
+  .footer-tagline {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Exo 2', sans-serif;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .content > * { animation: fadeUp 0.5s ease both; }
+  .content > *:nth-child(1) { animation-delay: 0.05s; }
+  .content > *:nth-child(2) { animation-delay: 0.1s; }
+  .content > *:nth-child(3) { animation-delay: 0.15s; }
+  .content > *:nth-child(4) { animation-delay: 0.2s; }
+  .content > *:nth-child(5) { animation-delay: 0.25s; }
+  .content > *:nth-child(6) { animation-delay: 0.3s; }
+  .content > *:nth-child(7) { animation-delay: 0.35s; }
+  .content > *:nth-child(8) { animation-delay: 0.4s; }
+  .content > *:nth-child(9) { animation-delay: 0.45s; }
+
+  /* Responsive */
+  @media (max-width: 680px) {
+    .split-row { grid-template-columns: 1fr; }
+    .steps-grid { grid-template-columns: 1fr 1fr; }
+    .callouts { grid-template-columns: 1fr; }
+    .step-card::after { display: none; }
+    .at-head, .at-row { grid-template-columns: 1fr 60px 60px; }
+    .at-range { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hex diamond background — matches pitch deck tile pattern -->
+<div class="hex-bg">
+  <svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="diamonds" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+        <!-- Diamond / rotated square tiles like in the deck -->
+        <rect x="10" y="10" width="60" height="60" rx="4"
+              fill="none" stroke="#3dbf8a" stroke-width="0.8"
+              transform="rotate(45 40 40)"/>
+        <rect x="22" y="22" width="36" height="36" rx="2"
+              fill="none" stroke="#c0186a" stroke-width="0.4"
+              transform="rotate(45 40 40)"/>
+      </pattern>
+      <!-- Radial fade mask -->
+      <radialGradient id="fade" cx="50%" cy="50%" r="70%">
+        <stop offset="0%" stop-color="white" stop-opacity="1"/>
+        <stop offset="100%" stop-color="white" stop-opacity="0.1"/>
+      </radialGradient>
+      <mask id="vmask">
+        <rect width="1000" height="700" fill="url(#fade)"/>
+      </mask>
+    </defs>
+    <!-- Tiled diamonds -->
+    <rect width="1000" height="700" fill="url(#diamonds)" mask="url(#vmask)"/>
+
+    <!-- Larger solid diamond shapes (top-left corner accent, like deck) -->
+    <g opacity="0.35">
+      <rect x="-30" y="60" width="90" height="90" rx="8" fill="#7a0040"
+            transform="rotate(45 15 105)"/>
+      <rect x="-60" y="160" width="70" height="70" rx="6" fill="#7a0040"
+            transform="rotate(45 -25 195)"/>
+      <rect x="20" y="200" width="55" height="55" rx="5" fill="none" stroke="#7a0040" stroke-width="2"
+            transform="rotate(45 47 227)"/>
+      <rect x="-10" y="300" width="75" height="75" rx="7" fill="#7a0040"
+            transform="rotate(45 27 337)"/>
+    </g>
+
+    <!-- Subtle teal shapes on right -->
+    <g opacity="0.12">
+      <rect x="900" y="50" width="80" height="80" rx="6" fill="#3dbf8a"
+            transform="rotate(45 940 90)"/>
+      <rect x="850" y="150" width="60" height="60" rx="5" fill="#3dbf8a"
+            transform="rotate(45 880 180)"/>
+    </g>
+  </svg>
+</div>
+
+<div class="page">
+<div class="content">
+
+  <!-- ── HEADER ── -->
+  <div class="deck-header">
+    <img class="logo-mark" src="/assets/Plyground_Logo_2DIcon_Color_v2.svg" alt="Plyground logo" />
+
+    <div class="header-text">
+      <div class="section-banner">Creator-First Economy</div>
+      <div class="page-title">Asset Revenue<br>Participation System</div>
+      <div class="page-subtitle">How Plyground distributes experience revenue</div>
+    </div>
+  </div>
+
+  <!-- ── BASE SPLIT ── -->
+  <div class="sec-head">
+    <div class="sec-banner">Base Revenue Split</div>
+    <div class="sec-tagline">Every experience distributes revenue across three participants</div>
+  </div>
+
+  <div class="split-row">
+    <div class="split-card platform">
+      <!-- Teal P icon -->
+      <svg class="card-icon" viewBox="0 0 36 36"><rect x="4" y="4" width="28" height="28" rx="4" fill="none" stroke="#3dbf8a" stroke-width="2.5"/><path d="M12 10 L12 26 L17 26 L17 19 L21 19 C25 19 27 17 27 14.5 C27 12 25 10 21 10Z M17 14 L21 14 C23 14 22.5 16 21 16 L17 16Z" fill="#3dbf8a"/></svg>
+      <div class="card-pct">20%</div>
+      <div class="card-role">Platform</div>
+      <div class="card-note">Fixed fee on all experience revenue. Funds platform infrastructure and development.</div>
+    </div>
+    <div class="split-card creator">
+      <!-- Magenta P icon -->
+      <svg class="card-icon" viewBox="0 0 36 36"><rect x="4" y="4" width="28" height="28" rx="4" fill="none" stroke="#c0186a" stroke-width="2.5"/><path d="M12 10 L12 26 L17 26 L17 19 L21 19 C25 19 27 17 27 14.5 C27 12 25 10 21 10Z M17 14 L21 14 C23 14 22.5 16 21 16 L17 16Z" fill="#c0186a"/></svg>
+      <div class="card-pct">50%</div>
+      <div class="card-role">Game Creator</div>
+      <div class="card-note">Base share — grows up to 80% when asset pool goes unused. Creators always win.</div>
+    </div>
+    <div class="split-card asset">
+      <!-- Gold P icon -->
+      <svg class="card-icon" viewBox="0 0 36 36"><rect x="4" y="4" width="28" height="28" rx="4" fill="none" stroke="#f5a623" stroke-width="2.5"/><path d="M12 10 L12 26 L17 26 L17 19 L21 19 C25 19 27 17 27 14.5 C27 12 25 10 21 10Z M17 14 L21 14 C23 14 22.5 16 21 16 L17 16Z" fill="#f5a623"/></svg>
+      <div class="card-pct">30%</div>
+      <div class="card-role">Asset Creators</div>
+      <div class="card-note">Pooled among participating assets. Automatically resolved via smart contract.</div>
+    </div>
+  </div>
+
+  <!-- ── VISUAL BAR ── -->
+  <div class="bar-section">
+    <div class="bar-label-row">
+      <span>Standard Distribution — 100% Revenue</span>
+      <span>Unused pool → returns to creator</span>
+    </div>
+    <div class="bar-track">
+      <div class="bar-seg" style="width:20%; background:#3dbf8a; border-radius:6px 0 0 6px">20%</div>
+      <div class="bar-seg" style="width:50%; background:#c0186a">50%</div>
+      <div class="bar-seg" style="width:30%; background:#f5a623; border-radius:0 6px 6px 0">30%</div>
+    </div>
+    <div class="bar-legend">
+      <div class="leg"><div class="leg-dot" style="background:#3dbf8a"></div>Platform (20%)</div>
+      <div class="leg"><div class="leg-dot" style="background:#c0186a"></div>Game Creator (50–80%)</div>
+      <div class="leg"><div class="leg-dot" style="background:#f5a623"></div>Asset Pool (up to 30%)</div>
+    </div>
+  </div>
+
+  <!-- ── SCENARIOS ── -->
+  <div class="scenario-block">
+    <div class="sec-head">
+      <div class="sec-banner">Revenue Scenarios</div>
+      <div class="sec-tagline">See how the split changes based on asset usage</div>
+    </div>
+
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="showSc('a',this)">No Assets</button>
+      <button class="tab-btn" onclick="showSc('b',this)">Partial Use (18%)</button>
+      <button class="tab-btn" onclick="showSc('c',this)">Full Pool (30%)</button>
+    </div>
+
+    <!-- A: No assets -->
+    <div class="scenario-panel active" id="sc-a">
+      <div class="sc-bar">
+        <div class="bar-seg" style="width:20%;background:#3dbf8a;border-radius:6px 0 0 6px;font-size:15px">20%</div>
+        <div class="bar-seg" style="width:80%;background:#c0186a;border-radius:0 6px 6px 0;font-size:15px">80%</div>
+      </div>
+      <div class="sc-rows">
+        <div class="sc-row">
+          <div class="sc-row-label">Platform</div>
+          <div class="sc-row-track"><div class="sc-row-fill" style="width:20%;background:#3dbf8a"></div></div>
+          <div class="sc-row-pct" style="color:#3dbf8a">20%</div>
+        </div>
+        <div class="sc-row">
+          <div class="sc-row-label">Game Creator</div>
+          <div class="sc-row-track"><div class="sc-row-fill" style="width:80%;background:#c0186a"></div></div>
+          <div class="sc-row-pct" style="color:#c0186a">80%</div>
+        </div>
+        <div class="sc-row">
+          <div class="sc-row-label">Assets</div>
+          <div class="sc-row-track"><div class="sc-row-fill" style="width:0%"></div></div>
+          <div class="sc-row-pct" style="color:#aaa">0%</div>
+        </div>
+      </div>
+      <div class="sc-note">No third-party assets used — the full 30% pool returns to the creator, giving them a maximum 80% share.</div>
+    </div>
+
+    <!-- B: Partial -->
+    <div class="scenario-panel" id="sc-b">
+      <div class="sc-bar">
+        <div class="bar-seg" style="width:20%;background:#3dbf8a;border-radius:6px 0 0 6px;font-size:15px">20%</div>
+        <div class="bar-seg" style="width:62%;background:#c0186a;font-size:15px">62%</div>
+        <div class="bar-seg" style="width:18%;background:#f5a623;border-radius:0 6px 6px 0;font-size:15px">18%</div>
+      </div>
+      <div class="sc-rows">
+        <div class="sc-row">
+          <div class="sc-row-label">Platform</div>
+          <div class="sc-row-track"><div class="sc-row-fill" style="width:20%;background:#3dbf8a"></div></div>
+          <div class="sc-row-pct" style="color:#3dbf8a">20%</div>
+        </div>
+        <div class="sc-row">
+          <div class="sc-row-label">Game Creator</div>
+          <div class="sc-row-track"><div class="sc-row-fill" style="width:62%;background:#c0186a"></div></div>
+          <div class="sc-row-pct" style="color:#c0186a">62%</div>
+        </div>
+        <div class="sc-row">
+          <div class="sc-row-label">Assets</div>
+          <div class="sc-row-track"><div class="sc-row-fill" style="width:18%;background:#f5a623"></div></div>
+          <div class="sc-row-pct" style="color:#f5a623">18%</div>
+        </div>
+      </div>
+      <div class="sc-note">Moderate asset usage — assets claim 18%, 12% of the pool is unused and automatically returned to the creator.</div>
+    </div>
+
+    <!-- C: Full pool -->
+    <div class="scenario-panel" id="sc-c">
+      <div class="sc-bar">
+        <div class="bar-seg" style="width:20%;background:#3dbf8a;border-radius:6px 0 0 6px;font-size:15px">20%</div>
+        <div class="bar-seg" style="width:50%;background:#c0186a;font-size:15px">50%</div>
+        <div class="bar-seg" style="width:30%;background:#f5a623;border-radius:0 6px 6px 0;font-size:15px">30%</div>
+      </div>
+      <div class="sc-rows">
+        <div class="sc-row">
+          <div class="sc-row-label">Platform</div>
+          <div class="sc-row-track"><div class="sc-row-fill" style="width:20%;background:#3dbf8a"></div></div>
+          <div class="sc-row-pct" style="color:#3dbf8a">20%</div>
+        </div>
+        <div class="sc-row">
+          <div class="sc-row-label">Game Creator</div>
+          <div class="sc-row-track"><div class="sc-row-fill" style="width:50%;background:#c0186a"></div></div>
+          <div class="sc-row-pct" style="color:#c0186a">50%</div>
+        </div>
+        <div class="sc-row">
+          <div class="sc-row-label">Assets</div>
+          <div class="sc-row-track"><div class="sc-row-fill" style="width:30%;background:#f5a623"></div></div>
+          <div class="sc-row-pct" style="color:#f5a623">30%</div>
+        </div>
+      </div>
+      <div class="sc-note">Full asset pool consumed — all participating third-party assets receive their allocated shares. Creator receives base 50%.</div>
+    </div>
+  </div>
+
+  <!-- ── PROCESS STEPS ── -->
+  <div class="sec-head">
+    <div class="sec-banner">Contract Resolution Process</div>
+    <div class="sec-tagline">Automated on every publish — zero manual negotiation</div>
+  </div>
+  <div class="steps-grid" style="margin-bottom:52px">
+    <div class="step-card">
+      <div class="step-num-bg">01</div>
+      <div class="step-title">Identify Assets</div>
+      <div class="step-desc">All assets with revenue sharing declared are identified. External marketplace assets are excluded.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num-bg">02</div>
+      <div class="step-title">Sum Minimums</div>
+      <div class="step-desc">Total minimum participation is calculated across all included assets to check feasibility.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num-bg">03</div>
+      <div class="step-title">Verify Feasibility</div>
+      <div class="step-desc">If minimums exceed the pool, creator must expand the pool, remove, or swap assets.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num-bg">04</div>
+      <div class="step-title">Distribute Budget</div>
+      <div class="step-desc">Remaining budget is split proportionally by each asset's expansion capacity (max − min).</div>
+    </div>
+  </div>
+
+  <!-- ── ASSET TABLE ── -->
+  <div class="asset-section">
+    <div class="sec-head">
+      <div class="sec-banner">Asset Participation Ranges</div>
+      <div class="sec-tagline">Each asset declares a Min–Max range. Contract fills between these bounds.</div>
+    </div>
+    <div class="asset-table">
+      <div class="at-head">
+        <span>Asset</span>
+        <span>Min</span>
+        <span>Max</span>
+        <span>Share Range</span>
+      </div>
+      <div class="at-row">
+        <div class="at-name">City Buildings</div>
+        <div class="at-pct min">4%</div>
+        <div class="at-pct max">8%</div>
+        <div class="at-range">
+          <div class="range-track"><div class="range-fill" style="left:13%;width:27%"></div></div>
+          <span style="font-size:11px;color:#999;white-space:nowrap">4% → 8%</span>
+        </div>
+      </div>
+      <div class="at-row">
+        <div class="at-name">Vehicles</div>
+        <div class="at-pct min">2%</div>
+        <div class="at-pct max">5%</div>
+        <div class="at-range">
+          <div class="range-track"><div class="range-fill" style="left:7%;width:10%"></div></div>
+          <span style="font-size:11px;color:#999;white-space:nowrap">2% → 5%</span>
+        </div>
+      </div>
+      <div class="at-row">
+        <div class="at-name">Vegetation</div>
+        <div class="at-pct min">1%</div>
+        <div class="at-pct max">3%</div>
+        <div class="at-range">
+          <div class="range-track"><div class="range-fill" style="left:3%;width:7%"></div></div>
+          <span style="font-size:11px;color:#999;white-space:nowrap">1% → 3%</span>
+        </div>
+      </div>
+      <!-- Totals row -->
+      <div class="at-row" style="background:#f9f9f9">
+        <div class="at-name" style="font-weight:800">Totals</div>
+        <div class="at-pct min" style="font-weight:800;color:#888">7% min</div>
+        <div class="at-pct max" style="font-weight:800">16% max</div>
+        <div class="at-range" style="font-size:12px;color:#555;font-weight:600">23% remaining budget to distribute</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CALLOUTS ── -->
+  <div class="callouts">
+    <div class="callout">
+      <div class="callout-emoji">⚡</div>
+      <div class="callout-title">Creator Control</div>
+      <div class="callout-body">Game creators choose which assets to include, directly controlling their payout. Asset creators compete by offering fair participation ranges — Plyground never sets asset values.</div>
+    </div>
+    <div class="callout">
+      <div class="callout-emoji">🔄</div>
+      <div class="callout-title">Unused Returns</div>
+      <div class="callout-body">Any unclaimed portion of the 30% asset pool automatically flows back to the game creator. Creators using only their own assets can earn up to 80% of total revenue.</div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div class="footer">
+    <div class="footer-logo">
+      <img src="/assets/Plyground_Logo_2DIcon_Color_v2.svg" alt="Plyground logo" width="32" height="32" />
+      <span class="footer-wordmark">plyground</span>
+    </div>
+    <div class="footer-tagline">Asset Revenue Participation System · Creator-First Economy</div>
+  </div>
+
+</div><!-- /content -->
+</div><!-- /page -->
+
+<script>
+  function showSc(id, btn) {
+    document.querySelectorAll('.scenario-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('sc-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
